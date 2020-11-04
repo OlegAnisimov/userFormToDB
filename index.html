@@ -17,12 +17,14 @@
 $(document).ready(function () {
     $('form').submit(function (e) {
         e.preventDefault()
-        console.log('gg')
         $.ajax({
             url: 'send.php',
             method: 'post',
             dataType: 'html',
-            data: $(this).serialize()
+            data: $(this).serialize(),
+            success: (data) => {
+                $('.info').html(data)
+            }
         })
     })
 })
