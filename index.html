@@ -10,10 +10,20 @@
 <form class="form" method="post">
     <input type="text" id="name" name="name" placeholder="ведите имя" required> <br />
     <input id="submit" type="submit" value="Отправить">
-<!--    <input id="submit" type="button" value="Отправить">-->
 </form>
 
+<div class="info"></div>
+<?php
+//if (mail('jrrtolkin@mail.ru', 'form', "dgdsgdsg")) {
+//    echo "good";
+//} else {
+//    echo "bad";
+//}
+//?>
 <script>
+    function ajax() {
+
+    }
 $(document).ready(function () {
     $('form').submit(function (e) {
         e.preventDefault()
@@ -22,18 +32,54 @@ $(document).ready(function () {
             method: 'post',
             dataType: 'html',
             data: $(this).serialize(),
-            success: (data) => {
-                $('.info').html(data)
+            error: function(xhr,status,error) {
+                $('.info').text($('#name').val() + ", " + "произошел сбой. Попробуйте позже.")
+            },
+            complete: function (xhr, status) {
+                console.log(xhr.responseText)
+                console.log(xhr.status)
+                if (xhr.responseText === "order exist") {
+                    $('.info').text($('#name').val() + ", " + "заявка уже отправлена")
+                }
+                else if (xhr.responseText !== "" && xhr.responseText !== "order exist") {
+                    $('.info').text($('#name').val() + ", " + "сервер недоступен Запрос будет повторен через 1 сек Попробуйте позже.")
+                    setTimeout(()=>{
+                        $.ajax({
+                            url: 'send.php',
+                            method: 'post',
+                            dataType: 'html',
+                            data: $(this).serialize(),
+                            complete: function (xhr ,status) {
+                                console.log(xhr.responseText)
+                                if (xhr.responseText !== "" && xhr.responseText !== "order exist") {
+                                    $('.info').text($('#name').val() + ", " + "сервер недоступен Попробуйте позже.")
+                        } else {
+                                    $('.info').text($('#name').val() + ", " + "Заявка отправлена.")
+                                    }
+                                }
+                            })
+                    }, 1000)
+                }
             }
         })
     })
 })
 </script>
+<!--
+     1. Создать отдельный js файл c jq ajax функцией
+     в index.html ызывать ф-ию в setTimeout
+     2. Проверка дублирующих записей в БД на backend
+        через exit()
+        сделать timestamp и проверять в текущие сутки
+     3. Как связывать события на бэкенде с информированием пользователя
+          Проверка дублей в случае успеха, генерирует исключение и возвращает  echo $e->getMessage();
+     4. Делать элемент id="submit" неактивным на время выполнения запроса
+     5. Выполнять подготовленные (для без-ти) PDO запросы
+     6. Если нет соединения с БД устанавливаем куки
+        Вызываем setTimeout с jq.ajax в качестве data используем куки
+     7. верстка писем
+     8. попробовать serializeArray вместо serialize
+ -->
 
-
-<!--<script src="1.js"> </script>-->
-<!--<script>-->
-<!--    document.querySelector('#submit').addEventListener('click', request)-->
-<!--</script>-->
 </body>
 </html>
