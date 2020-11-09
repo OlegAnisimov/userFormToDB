@@ -7,21 +7,30 @@ try {
     $connection = new PDO($dsn, $dbuser, $dbpass);
     $connection->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
     if (isset($_POST['name'])) {
+        // Добавить в асоц массив
+        // применить к каждомк элементу массива ф-ую {strip_tags, htmlentities}
         $name = strip_tags($_POST['name']);
         $name = htmlentities($_POST['name']);
-        $sqlCheckQuery = "SELECT name FROM form WHERE name = '$name'";
+        $moment = new DateTime();
+        $momentUnix = $moment->getTimestamp();
+
+        $sqlCheckQuery = "SELECT name FROM form WHERE name = '$name' AND time > ('$momentUnix' - '86400') AND time < '$momentUnix'";
         $check         = $connection->prepare($sqlCheckQuery);
         $check->execute([$name]);
         $condition = $check->fetchColumn();
         if (gettype($condition) === "string") { // наличие запсис
             exit("order exist");
         } else
-            setcookie('name', $name);
-            $sql_insert = "INSERT INTO form(name) VALUES ('$name')";
+//            setcookie('name', $name);
+            $moment = new DateTime();
+            $momentUnix = $moment->getTimestamp();
+            $sql_insert = "INSERT INTO form(name, time) VALUES ('$name', '$momentUnix')";
             $connection->query($sql_insert);
             mail('jrrtolkin@mail.ru', 'form', "dgdsgdsg");
     }} catch (PDOException $e) {
-    echo $e->getMessage("BD problems");
+//        $message = "$e" + "Время инцидента" + "$moment->format('d/m/Y\ H:i:s.u')"; // Здесь ошибка тестить
+////        mail('jrrtolkin@mail.ru', 'DB "test" problem', "$message"); // admin alert
+        exit("DB_Exception");
 }
 
 
