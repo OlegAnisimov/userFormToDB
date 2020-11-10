@@ -6,11 +6,13 @@ $arr = []; //?
 try {
     $connection = new PDO($dsn, $dbuser, $dbpass);
     $connection->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-    if (isset($_POST['name'])) {
+    if (isset($_POST['name']) && $_POST['name'] !=="") {
         // Добавить в асоц массив
         // применить к каждомк элементу массива ф-ую {strip_tags, htmlentities}
         $name = strip_tags($_POST['name']);
         $name = htmlentities($_POST['name']);
+
+        setcookie('name', $name);
         $moment = new DateTime();
         $momentUnix = $moment->getTimestamp();
 
@@ -21,12 +23,11 @@ try {
         if (gettype($condition) === "string") { // наличие запсис
             exit("order exist");
         } else
-//            setcookie('name', $name);
             $moment = new DateTime();
             $momentUnix = $moment->getTimestamp();
             $sql_insert = "INSERT INTO form(name, time) VALUES ('$name', '$momentUnix')";
             $connection->query($sql_insert);
-            mail('jrrtolkin@mail.ru', 'form', "dgdsgdsg");
+//            mail('jrrtolkin@mail.ru', 'form', "dgdsgdsg");
     }} catch (PDOException $e) {
 //        $message = "$e" + "Время инцидента" + "$moment->format('d/m/Y\ H:i:s.u')"; // Здесь ошибка тестить
 ////        mail('jrrtolkin@mail.ru', 'DB "test" problem', "$message"); // admin alert

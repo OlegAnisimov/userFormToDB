@@ -8,14 +8,22 @@
 </head>
 <body>
 <form class="form" method="post">
-    <input type="text" id="name" name="name" placeholder="ведите имя" required> <br/>
+    <input type="text" id="name" name="name" placeholder="ведите имя" required>
     <input id="submit" type="submit" value="Отправить">
 </form>
 <div class="info"></div>
 <div class="service"></div>
+
 <script>
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
     $(document).ready(function () {
-        $('form').submit(function (e) {
+        $("form").submit(function f(e) {
             e.preventDefault()
             $.ajax({
                 url: 'send.php',
@@ -26,22 +34,22 @@
                     $('.info').text($('#name').val() + ", " + "произошел сбой. Попробуйте позже.")
                 },
                 complete: function (xhr, status) {
-                    console.log(xhr.responseText)
-                    target = xhr.responseText
                     switch (xhr.responseText) {
                         case "DB_Exception":
-                            console.log(xhr.responseText)
                             $('.info').text($('#name').val() + ", " + "произошел сбой. Отправка будет проходить в фоновом режиме, не закрывайте страницу.")
-
+                            console.log(getCookie('name'))
                             break
                         case "order exist":
-                            $('.info').text($('#name').val() + ", " + "заявка уже есть в БД. Специалист свяжеться Вами в ближайшее время.")                                              break
+                            $('.info').text($('#name').val() + ", " + "заявка уже есть в БД. Специалист свяжеться Вами в ближайшее время.")
+                            break
                         case "":
                             $('.info').text($('#name').val() + ", " + "заявка отправлена.")
                             break
                         default:
-                            $('.info').text($('#name').val() + ", " + "Что то пошло не так. Мы работаем над этим.")
-                            $('.service').html("<div> <?php mail('jrrtolkin@mail.ru', 'DB "test" problem', "Неизвестная ошибка с отправкой данных с формы"); ?> </div>")
+                            $('.info').text($('#name').val() + ", " + "Что-то пошло не так. Мы работаем над этим.")
+                            console.log(xhr.responseText)
+                            //$('.service').html("<div> <?php //mail('jrrtolkin@mail.ru', 'DB "test" problem',
+                        //    "Неизвестная ошибка с отправкой данных"); ?>// </div>")
                             break
                     }
                 }
@@ -49,6 +57,7 @@
         })
     })
 </script>
+
 <!--
      1. Создать отдельный js файл c jq ajax функцией
      в index.html ызывать ф-ию в setTimeout
